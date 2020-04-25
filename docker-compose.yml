@@ -1,0 +1,90 @@
+version: '3'
+services:
+  db:
+    image: postgres:11.7-alpine
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${YASC_DATABASE_PASSWORD}
+      POSTGRES_DB: yasc_production
+
+  yasc-redis:
+    image: redis:5.0.8-alpine
+    ports:
+      - 6380:6380
+    command: --port 6380
+
+  yasc:
+    depends_on: 
+      - "db"
+      - "yasc-redis"
+    image: jorgebarreto/yasc
+    ports: 
+      - 3000:3000
+      - 3001:3001
+    environment: 
+      RAILS_ENV: production
+      YASC_DATABASE_PASSWORD: ${YASC_DATABASE_PASSWORD}
+      REDIS_URL: redis://yasc-redis:6380
+    volumes:
+      - certs:/etc/letsencrypt/
+    command: bundle exec rails s
+
+  code-runner-redis:
+    image: redis:5.0.8-alpine
+    ports:
+      - 6379:6379
+
+  code-dueler:
+    image: jorgebarreto/code-dueler:0.7.0
+    depends_on:
+      - code-runner-redis
+    ports:
+      - 5000:5000
+    environment: 
+      NODE_ENV: production
+      HTTPS: 'true'
+      SSL_CRT_FILE: /etc/letsencrypt/live/jorgebarreto.dev/fullchain.pem
+      SSL_KEY_FILE: /etc/letsencrypt/live/jorgebarreto.dev/privkey.pem
+      REACT_APP_GRAPHQL_URI: https://codedueler.jorgebarreto.dev/graphql
+      REACT_APP_GRAPHQL_WS_URI: wss://codedueler.jorgebarreto.dev/graphql
+      SECRET_OR_KEY: ${SECRET_OR_KEY}
+      MONGO_URI: ${MONGO_URI}
+      REDIS_URI: code-runner-redis
+      DOCKERIZED: 'true'
+    volumes:
+      - certs:/etc/letsencrypt
+
+  web:
+    build: ./web
+    depends_on: 
+      - "yasc"
+      - "code-dueler"
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - webroot:/usr/share/nginx/html
+      - certs:/etc/letsencrypt/
+      - ./web/nginx_logs:/var/log/nginx/
+
+  certbot:
+    depends_on: 
+      - "web"
+    image: certbot/certbot
+    volumes: 
+      - webroot:/www
+      - certs:/etc/letsencrypt/
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    
+
+volumes:
+  postgres:
+  webroot:
+  certs:
+    external:
+      true
