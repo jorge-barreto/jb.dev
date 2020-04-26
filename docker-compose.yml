@@ -68,7 +68,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - webroot:/usr/share/nginx/html
+      - ./web/nginx_webroot:/usr/share/nginx/html
       - certs:/etc/letsencrypt/
       - ./web/nginx_logs:/var/log/nginx/
 
@@ -77,7 +77,7 @@ services:
       - "web"
     image: certbot/certbot
     volumes: 
-      - webroot:/www
+      - ./web/nginx_webroot:/www
       - certs:/etc/letsencrypt/
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     
