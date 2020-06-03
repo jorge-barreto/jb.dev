@@ -3,17 +3,17 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Jorge Barreto | from nowhere, with &lt;3</title>
+<title>LARV | Jorge Barreto</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Jorge Barreto" />
+<meta property="og:title" content="LARV" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="from nowhere, with &lt;3" />
 <meta property="og:description" content="from nowhere, with &lt;3" />
-<link rel="canonical" href="https://jorgebarreto.dev/" />
-<meta property="og:url" content="https://jorgebarreto.dev/" />
+<link rel="canonical" href="https://jorgebarreto.dev/projects/larv/" />
+<meta property="og:url" content="https://jorgebarreto.dev/projects/larv/" />
 <meta property="og:site_name" content="Jorge Barreto" />
 <script type="application/ld+json">
-{"description":"from nowhere, with &lt;3","@type":"WebSite","url":"https://jorgebarreto.dev/","name":"Jorge Barreto","headline":"Jorge Barreto","@context":"https://schema.org"}</script>
+{"description":"from nowhere, with &lt;3","@type":"WebPage","url":"https://jorgebarreto.dev/projects/larv/","headline":"LARV","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jorgebarreto.dev/feed.xml" title="Jorge Barreto" /></head>
 <body><header class="site-header" role="banner">
@@ -33,29 +33,19 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <div class="home"><h2 id="welcome-to-jbdev">Welcome to jb.dev!</h2>
+        <div class="page">
 
-<p>If you see this page, it means my domain host and webserver configurations are working just fine.</p>
+  <header class="page-header">
+    <h2 class="page-title">LARV</h1>
+  </header>
 
-<p>I’ve carved out this little slice of digital freedom to serve as an anchor for my professionally digital self, as well as reverse proxy for my side projects. Here are a couple of those:</p>
+  <div class="page-content">
+    <p>The ActiveRecordLite Visualizer is a tool that I built on my off-time during my time at App Academy in order to show off another tool that I had made: ActiveRecordLite. ARL is a clone of some of the basic functionality offered by ActiveRecord. It was born out of an attempt to practice some metaprogramming techniques that I had just learned, and grew into something a little more serious. Essentially, it uses the SQLite3 gem to establish a connection to a sqlite database and gather information about the tables present and their appurtenant columns. It then uses this information to create a new Ruby class for each table, and a set of query methods for those classes, based again on table information. These methods make use of a homespun SQL AST manager (SastMan) which allows them to be chained arbitrarily.</p>
 
-<ul>
-  <li>
-    <h4 id="yasc---slack-clone-built-with-react-on-rails-6"><a href="https://yasc.jorgebarreto.dev/">YASC</a> - Slack clone built with React on Rails 6</h4>
-  </li>
-  <li>
-    <h4 id="code-dueler---real-time-colosseum-style-coding-challenge-built-with-react-on-express-powered-by-graphql"><a href="https://codedueler.jorgebarreto.dev/">Code Dueler</a> - Real-time, colosseum-style coding challenge built with React on Express, powered by GraphQL</h4>
-  </li>
-</ul>
+<p>SastMan is in essence a top-down parser of a certain subset of SQL SELECT statements (check the <a href="https://github.com/app-academy-exercises-jb/ActiveRecord-Lite#sastman">documentation</a> for specifics). It generates an abstract syntax tree of a given statement by performing lexical and syntactic analysis on a query string. In particular, a lexer passes over a string literal, returning an array of tokens. The tokens are then passed to the parser, which generates the AST by using a technique known as recursive descent, specifically implementing Dijkstra’s Shunting Yard Algorithm for parsing operator precedence.</p>
 
-<p><br /></p>
+  </div>
 
-<hr />
-<p><br /></p>
-
-<p>Check out the <a href="/about">about</a> page for some background on my person. On the <a href="/projects">projects</a> page, you can read more about the work I found interesting enough to write about.</p>
-
-<p>Need to hire an exemplary dev? My resume’s <a href="https://jorgebarreto.dev/resume">here</a>.</p>
 </div>
 
       </div>

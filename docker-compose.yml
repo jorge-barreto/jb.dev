@@ -1,27 +1,30 @@
-version: '3'
+version: '3.1'
 services:
   db:
     image: postgres:11.7-alpine
-    restart: always
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - yasc_db:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment: 
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${YASC_DATABASE_PASSWORD}
       POSTGRES_DB: yasc_production
+    networks:
+      - internal
 
   yasc-redis:
     image: redis:5.0.8-alpine
     ports:
       - 6380:6380
     command: --port 6380
+    networks:
+      - internal
 
   yasc:
-    depends_on: 
-      - "db"
-      - "yasc-redis"
+    depends_on:
+      - db
+      - yasc-redis
     image: jorgebarreto/yasc
     ports: 
       - 3000:3000
@@ -30,37 +33,69 @@ services:
       RAILS_ENV: production
       YASC_DATABASE_PASSWORD: ${YASC_DATABASE_PASSWORD}
       REDIS_URL: redis://yasc-redis:6380
+    networks:
+      - default
+      - internal
     volumes:
       - certs:/etc/letsencrypt/
-    command: bundle exec rails s
+    entrypoint: "/bin/sh -c 'cd /usr/src/app && bundle exec rails db:setup; bundle exec rails s'"
+    # command: bundle exec rails s
 
-  code-runner-redis:
+  code-dueler-redis:
     image: redis:5.0.8-alpine
     ports:
       - 6379:6379
-
+    networks:
+      - internal
+  
+  code-dueler-judge:
+    image: jorgebarreto/code-dueler-judge:0.2.0
+    depends_on: 
+      - code-dueler-redis
+    ports: 
+      - 5005:5005
+    networks:
+      - internal
+    environment:
+      NODE_ENV: production
+      TESTING_DIR: $PWD/code_judge/test
+      CRT_FILE: /etc/letsencrypt/live/jorgebarreto.dev/fullchain.pem
+      KEY_FILE: /etc/letsencrypt/live/jorgebarreto.dev/privkey.pem
+      SECRET_OR_KEY: ${SECRET_OR_KEY}
+      SERVER_URI: https://server:5000
+      REDIS_URI: redis://code-dueler-redis
+      MONGO_URI: ${WORKER_MONGO_URI}
+      PORT: 5005
+    volumes:
+      - certs:/etc/letsencrypt
+  
   code-dueler:
-    image: jorgebarreto/code-dueler:0.7.0
+    image: jorgebarreto/code-dueler:0.9.1.4
     depends_on:
-      - code-runner-redis
+      - code-dueler-redis
     ports:
       - 5000:5000
+    networks:
+      - default
+      - internal
     environment: 
       NODE_ENV: production
-      HTTPS: 'true'
-      SSL_CRT_FILE: /etc/letsencrypt/live/jorgebarreto.dev/fullchain.pem
-      SSL_KEY_FILE: /etc/letsencrypt/live/jorgebarreto.dev/privkey.pem
-      REACT_APP_GRAPHQL_URI: https://codedueler.jorgebarreto.dev/graphql
-      REACT_APP_GRAPHQL_WS_URI: wss://codedueler.jorgebarreto.dev/graphql
+      HTTPS: 'false'
+      CRT_FILE: /etc/letsencrypt/live/jorgebarreto.dev/fullchain.pem
+      KEY_FILE: /etc/letsencrypt/live/jorgebarreto.dev/privkey.pem
+      REACT_APP_GRAPHQL_URI: https://code-dueler/graphql
+      REACT_APP_GRAPHQL_WS_URI: wss://code-dueler/graphql
       SECRET_OR_KEY: ${SECRET_OR_KEY}
       MONGO_URI: ${MONGO_URI}
-      REDIS_URI: code-runner-redis
+      REDIS_URI: redis://code-dueler-redis
+      REDIS_HOST: code-dueler-redis
+      CODE_JDG_URI: http://code-dueler-judge:5005
       DOCKERIZED: 'true'
     volumes:
       - certs:/etc/letsencrypt
 
   web:
-    build: ./web
+    image: jorgebarreto/web:1.0.8
     depends_on: 
       - "yasc"
       - "code-dueler"
@@ -68,23 +103,28 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./web/nginx_webroot:/usr/share/nginx/html
+      - wellknown_webroot:/usr/share/nginx/html/.well-known
       - certs:/etc/letsencrypt/
-      - ./web/nginx_logs:/var/log/nginx/
+      - ~/docker_app/web/nginx_logs:/var/log/nginx/
 
   certbot:
     depends_on: 
       - "web"
     image: certbot/certbot
     volumes: 
-      - ./web/nginx_webroot:/www
+      - wellknown_webroot:/www
       - certs:/etc/letsencrypt/
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    
 
 volumes:
-  postgres:
-  webroot:
+  yasc_db:
+  wellknown_webroot:
   certs:
     external:
       true
+
+networks:
+  default:
+    external:
+      name: webnet
+  internal:

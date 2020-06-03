@@ -3,17 +3,17 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Jorge Barreto | from nowhere, with &lt;3</title>
+<title>CodeDueler | Jorge Barreto</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Jorge Barreto" />
+<meta property="og:title" content="CodeDueler" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="from nowhere, with &lt;3" />
 <meta property="og:description" content="from nowhere, with &lt;3" />
-<link rel="canonical" href="https://jorgebarreto.dev/" />
-<meta property="og:url" content="https://jorgebarreto.dev/" />
+<link rel="canonical" href="https://jorgebarreto.dev/projects/codedueler" />
+<meta property="og:url" content="https://jorgebarreto.dev/projects/codedueler" />
 <meta property="og:site_name" content="Jorge Barreto" />
 <script type="application/ld+json">
-{"description":"from nowhere, with &lt;3","@type":"WebSite","url":"https://jorgebarreto.dev/","name":"Jorge Barreto","headline":"Jorge Barreto","@context":"https://schema.org"}</script>
+{"description":"from nowhere, with &lt;3","@type":"WebPage","url":"https://jorgebarreto.dev/projects/codedueler","headline":"CodeDueler","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jorgebarreto.dev/feed.xml" title="Jorge Barreto" /></head>
 <body><header class="site-header" role="banner">
@@ -33,29 +33,23 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <div class="home"><h2 id="welcome-to-jbdev">Welcome to jb.dev!</h2>
+        <div class="page">
 
-<p>If you see this page, it means my domain host and webserver configurations are working just fine.</p>
+  <header class="page-header">
+    <h2 class="page-title">CodeDueler</h1>
+  </header>
 
-<p>I’ve carved out this little slice of digital freedom to serve as an anchor for my professionally digital self, as well as reverse proxy for my side projects. Here are a couple of those:</p>
+  <div class="page-content">
+    <p>A real-time, colosseum-style coding challenge where the participants must race to correctly complete some coding challenge (say, FizzBuzz) while their adoring audience looks on. Players can see their opponent’s stats (line count, passed tests), and spectators can see what each player is typing in real time.</p>
 
-<ul>
-  <li>
-    <h4 id="yasc---slack-clone-built-with-react-on-rails-6"><a href="https://yasc.jorgebarreto.dev/">YASC</a> - Slack clone built with React on Rails 6</h4>
-  </li>
-  <li>
-    <h4 id="code-dueler---real-time-colosseum-style-coding-challenge-built-with-react-on-express-powered-by-graphql"><a href="https://codedueler.jorgebarreto.dev/">Code Dueler</a> - Real-time, colosseum-style coding challenge built with React on Express, powered by GraphQL</h4>
-  </li>
-</ul>
+<p>This group effort was developed on the MERN stack, powered by Apollo GraphQL. I took on the responsibilities of system design and backend development. The basic architecture is simple: a React frontend connects to an Express on Node server, receiving its data using GraphQL. Specifically, GraphQL Subscriptions (which is essentially Websockets) are used to ensure real-time data, with a Redis Pub/Sub stream at the heart of it. Coding submissions are reviewed by a coding judge which lives on a Google Cloud Function.</p>
 
-<p><br /></p>
+<p>I wrote most of the server itself, along with the relevant Mongoose models. I leveraged the persistence of the pubsub and client websocket objects in order to cache requests from the server in a way that allows for very fast access to most clients. I also wrote the coding judge, which is basically an express server which sets up a sandboxed environment per request that returns stack trace info.</p>
 
-<hr />
-<p><br /></p>
+<p><img src="/assets/CodeDueler_Spectator.png" alt="CodeDueler Spectator View" /></p>
 
-<p>Check out the <a href="/about">about</a> page for some background on my person. On the <a href="/projects">projects</a> page, you can read more about the work I found interesting enough to write about.</p>
+  </div>
 
-<p>Need to hire an exemplary dev? My resume’s <a href="https://jorgebarreto.dev/resume">here</a>.</p>
 </div>
 
       </div>
