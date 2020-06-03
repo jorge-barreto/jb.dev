@@ -1,0 +1,68 @@
+to automatically renew:
+entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+to add a new domain through certbot:
+command: [ "certonly", "--expand", "--noninteractive", "--webroot", "--webroot-path", "/www", "-d", "jorgebarreto.dev,www.jorgebarreto.dev,codedueler.jorgebarreto.dev,yasc.jorgebarreto.dev" ]
+
+
+
+code-runner-server:
+  image: jorgebarreto/code_runner_server
+  depends_on: 
+    - "code-runner-redis"
+  ports: 
+    - 5000:5000
+  environment: 
+    NODE_ENV: production
+    SECRET_OR_KEY: ${SECRET_OR_KEY}
+    MONGO_URI: ${MONGO_URI}
+    REDIS_URI: code-runner-redis
+    PRODUCTION_URI: https://code-runner-client:3002
+    DOCKERIZED: 'true'
+  volumes:
+    - certs:/etc/letsencrypt/
+
+code-runner-client:
+  image: jorgebarreto/code_runner_client
+  depends_on: 
+    - "code-runner-server"
+  ports:
+    - 3002:3002
+  environment: 
+    NODE_ENV: production
+    PORT: 3002
+    HTTPS: 'true'
+    SSL_CRT_FILE: /etc/letsencrypt/live/jorgebarreto.dev/fullchain.pem
+    SSL_KEY_FILE: /etc/letsencrypt/live/jorgebarreto.dev/privkey.pem
+    REACT_APP_GRAPHQL_URI: https://codedueler.jorgebarreto.dev/graphql
+    REACT_APP_GRAPHQL_WS_URI: wss://codedueler.jorgebarreto.dev/graphql
+  volumes:
+    - certs:/etc/letsencrypt
+  stdin_open: true
+
+
+
+
+
+
+
+  code-dueler:
+    image: jorgebarreto/code-dueler
+    depends_on:
+      - code-runner-redis
+    ports:
+      - 5000:5000
+    environment: 
+      NODE_ENV: production
+      HTTPS: 'true'
+      SSL_CRT_FILE: /etc/letsencrypt/live/jorgebarreto.dev/fullchain.pem
+      SSL_KEY_FILE: /etc/letsencrypt/live/jorgebarreto.dev/privkey.pem
+      REACT_APP_GRAPHQL_URI: https://codedueler.jorgebarreto.dev/graphql
+      REACT_APP_GRAPHQL_WS_URI: wss://codedueler.jorgebarreto.dev/graphql
+      SECRET_OR_KEY: ${SECRET_OR_KEY}
+      MONGO_URI: ${MONGO_URI}
+      REDIS_URI: code-runner-redis
+      DOCKERIZED: 'true'
+    volumes:
+      - certs:/etc/letsencrypt
+
