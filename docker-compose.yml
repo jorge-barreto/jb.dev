@@ -49,7 +49,7 @@ services:
       - internal
   
   code-dueler-judge:
-    image: jorgebarreto/code-dueler-judge:0.2.0
+    image: jorgebarreto/code-dueler-judge:0.4.3
     depends_on: 
       - code-dueler-redis
     ports: 
@@ -67,10 +67,12 @@ services:
       MONGO_URI: ${WORKER_MONGO_URI}
       PORT: 5005
     volumes:
+      - $PWD/code_judge/test:/usr/src/app/test
+      - /var/run/docker.sock:/var/run/docker.sock
       - certs:/etc/letsencrypt
   
   code-dueler:
-    image: jorgebarreto/code-dueler:0.9.1.4
+    image: jorgebarreto/code-dueler:0.9.3
     depends_on:
       - code-dueler-redis
     ports:
